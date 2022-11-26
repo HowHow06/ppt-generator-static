@@ -1,0 +1,617 @@
+<link rel="stylesheet" href="./assets/css/drag-n-drop.css">
+<link rel="stylesheet" href="./bundle/vendors/coloris/coloris.min.css">
+<div class="container">
+    <div class="alert alert-success" style="display: none; position: fixed; right: 100px; top: 50px; z-index: 2000"
+        id="copied-alert">
+        <i class="fa-solid fa-circle-check"></i>
+        已复制到剪贴板
+    </div>
+    <div class="row">
+        <section id="main" class="col-md-12">
+            <article>
+                <div class="kratos-hentry kratos-post-inner clearfix">
+                    <div class="kratos-post-content">
+                        <!-- 开始 内容 -->
+                        <h1>PPT 生成器 （测试版）</h1>
+
+                        <h3>1. 背景图 / 颜色 </h3>
+                        <p>
+                            注：预设背景色为黑色
+                        </p>
+                        <div>
+                            <label class="form-check-label">背景图</label>
+                            <div class="drop-zone">
+                                <span class="drop-zone__prompt">Drop file here or click to upload</span>
+                                <input type="file" accept="image/*" name="myFile" id="uploadBackgroundImage"
+                                    class="drop-zone__input">
+                            </div>
+                            <a href="./assets/img/greenScreenWithBlackCover_v2.png" target="_blank">
+                                <i class="fa-solid fa-up-right-from-square"></i> 预设绿幕背景图
+                            </a>
+                        </div>
+                        <div class="mt-2 d-inline-block">
+                            <label class="form-check-label d-block" for="colorPickerBackground">背景色</label>
+                            <input type="text" id="colorPickerBackground" value="#000000" data-coloris>
+                        </div>
+                    </div>
+                </div>
+                <div class="kratos-hentry kratos-post-inner clearfix">
+                    <div class="kratos-post-content">
+                        <h3>2. 输入中文或主内容</h3>
+                        <div>
+                            <div>现所选行数:<span id="lineNo"></span></div>
+                            <textarea id="input-text" class="texttosrt"
+                                onkeyup="updateLineNumber(this, document.getElementById('lineNo'));"
+                                onmouseup="this.onkeyup();"></textarea>
+                            <button type="button" title="把以上内容转为简体" class="btn-custom"
+                                onclick="onConvertToSimplifiedClick()">
+                                ^ 转简体
+                            </button>
+                            <button type="button" title="把以上内容里的“他”转为“祂”" class="btn-custom"
+                                onclick="onConvertCharacterClick('他','祂')">
+                                ^ 他 -> 祂
+                            </button>
+                            <button type="button" title="把以上内容里的“你”转为“祢”" class="btn-custom"
+                                onclick="onConvertCharacterClick('你','祢')">
+                                ^ 你 -> 祢
+                            </button>
+                            <button type="button" title="在以下文本框生成拼音(带声调)" class="btn-custom"
+                                onclick="onGeneratePinyinClick({hasSound : true})">
+                                生成拼音 (带声调)
+                            </button>
+                            <button type="button" title="在以下文本框生成拼音(不带声调)" class="btn-custom"
+                                onclick="onGeneratePinyinClick({hasSound : false})">
+                                生成拼音 (不带声调)
+                            </button>
+                            <button type="button" class="btn-custom" onclick="onClearClick()">
+                                清空
+                            </button>
+                        </div>
+                        <p>
+                            注：此处的转换会把“祢”字的拼音翻成“ni”
+                        </p>
+
+
+                        <h3>3. 输入拼音或副内容</h3>
+                        <div id="outputWrapper">
+                            <textarea id="output-temp" class="texttosrt" spellcheck="false"></textarea>
+                        </div>
+                        <!-- 结束 内容 -->
+                    </div>
+
+                </div>
+                <div class="kratos-hentry kratos-post-inner clearfix">
+                    <div class="kratos-post-content">
+                        <!-- 内容 -->
+                        <div class="d-flex justify-content-between">
+                            <!-- <a href="#advanced-setting">高级设定</a> -->
+                            <div>
+                                <h3>4. 设定</h3>
+                            </div>
+                            <div>
+                                <button type="button" class="btn-custom" onclick="onApplySettingsClick()">
+                                    应用
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between my-2">
+                            <div>
+                                <button class="btn-custom dropdown-toggle" type="button" id="dropdownMenuButton"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    选择预设设定
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <button type="button" class="dropdown-item cursor-pointer"
+                                        onclick="onRestoreNormalDefaultOptionClick()">
+                                        普通预设
+                                    </button>
+                                    <button type="button" class="dropdown-item cursor-pointer"
+                                        onclick="onRestoreGreenScreenDefaultOptionClick()">
+                                        绿幕预设
+                                    </button>
+                                    <button type="button" class="dropdown-item cursor-pointer"
+                                        onclick="readSettingsFileFromURL('./assets/storage/EnglishOnlyv2.json')">
+                                        普通:英文
+                                    </button>
+                                    <button type="button" class="dropdown-item cursor-pointer"
+                                        onclick="readSettingsFileFromURL('./assets/storage/EnglishOnlyLivev2.json')">
+                                        绿幕:英文
+                                    </button>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="custom-file-upload cursor-pointer onhover-underline default-anchor">
+                                    <input type="file" class="d-none" id="uploadSetting" />
+                                    导入设定
+                                </label>
+                                <button type="button" class="btn-custom" onclick="onExportSettingClick()">
+                                    导出设定
+                                </button>
+                            </div>
+                        </div>
+                        <!-- <div id="output"></div> -->
+                        <div class="d-flex justify-content-between settings-panel container-fluid p-0 m-0">
+                            <div class="row" style="width: 100%">
+                                <div class="col-md-6 col-sm-12 mt-md-2">
+                                    <span>主内容属性</span>
+                                    <hr>
+                                    <form action="post" id="primarySettings">
+                                        <div class="container-fluid p-0">
+                                            <div class="row">
+                                                <label for="x" class="col-sm-4 col-form-label">X(%)</label>
+                                                <div class="col-sm-8">
+                                                    <input type="number" id="x" name="x" placeholder="0">
+                                                    <i class="fa-solid fa-circle-info ml-2" data-toggle="tooltip"
+                                                        title="文本框与左边框之间的距离(0-100)"></i>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="y-upper" class="col-sm-4 col-form-label">Upper Y(%)</label>
+                                                <div class="col-sm-8">
+                                                    <input type="number" name="y-upper" placeholder="10">
+                                                    <i class="fa-solid fa-circle-info ml-2" data-toggle="tooltip"
+                                                        title="文本框与上边框之间的距离(0-100)"></i>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="y-lower" class="col-sm-4 col-form-label">Lower Y(%)</label>
+                                                <div class="col-sm-8">
+                                                    <input type="number" name="y-lower" placeholder="10">
+                                                    <i class="fa-solid fa-circle-info ml-2" data-toggle="tooltip"
+                                                        title="文本框与上边框之间的距离(0-100)"></i>
+                                                </div>
+                                            </div>
+                                            <hr>
+                                            <div class="row">
+                                                <label for="bold" class="col-sm-4 col-form-label">Bold</label>
+                                                <div class="col-sm-8">
+                                                    <input type="checkbox" name="bold">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="color" class="col-sm-4 col-form-label">Font Color</label>
+                                                <div class="col-sm-8">
+                                                    <input type="text" name="color" value="#000000" data-coloris>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="fontFace" class="col-sm-4 col-form-label">Font</label>
+                                                <div class="col-sm-8">
+                                                    <input list="fontFaces" name="fontFace" /></label>
+                                                    <datalist id="fontFaces">
+                                                    </datalist>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="fontSize" class="col-sm-4 col-form-label">Font Size
+                                                    (pt)</label>
+                                                <div class="col-sm-8">
+                                                    <input type="number" name="fontSize" placeholder="48">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="charSpacing" class="col-sm-4 col-form-label">Char Spacing
+                                                    (pt)</label>
+                                                <div class="col-sm-8">
+                                                    <input type="number" name="charSpacing" placeholder="2">
+                                                    <i class="fa-solid fa-circle-info ml-2" data-toggle="tooltip"
+                                                        title="文本间距"></i>
+                                                </div>
+                                            </div>
+                                            <hr>
+                                            <div class="row">
+                                                <label for="cover-y" class="col-sm-4 col-form-label">Cover Y(%)</label>
+                                                <div class="col-sm-8">
+                                                    <input type="number" name="cover-y" placeholder="10">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="cover-fontFace" class="col-sm-4 col-form-label">Cover
+                                                    Font</label>
+                                                <div class="col-sm-8">
+                                                    <input list="fontFaces" name="cover-fontFace" /></label>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="cover-fontSize" class="col-sm-4 col-form-label">Cover Font
+                                                    Size (pt)</label>
+                                                <div class="col-sm-8">
+                                                    <input type="number" name="cover-fontSize" placeholder="10">
+                                                </div>
+                                            </div>
+                                            <hr>
+                                            <div class="row">
+                                                <label for="hasGlow" class="col-sm-4 col-form-label">Has Glow</label>
+                                                <div class="col-sm-8">
+                                                    <input type="checkbox" name="hasGlow">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="glow-size" class="col-sm-4 col-form-label">Glow Size
+                                                    (pt)</label>
+                                                <div class="col-sm-8">
+                                                    <input type="number" name="glow-size" placeholder="5">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="glow-color" class="col-sm-4 col-form-label">Glow
+                                                    Color</label>
+                                                <div class="col-sm-8">
+                                                    <input type="text" name="glow-color" value="#000000" data-coloris>
+                                                </div>
+                                            </div>
+                                            <hr>
+                                            <div class="row">
+                                                <label for="hasOutline" class="col-sm-4 col-form-label">Has
+                                                    Outline</label>
+                                                <div class="col-sm-8">
+                                                    <input type="checkbox" name="hasOutline">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="outline-size" class="col-sm-4 col-form-label">Outline Weight
+                                                    (pt)</label>
+                                                <div class="col-sm-8">
+                                                    <input type="number" name="outline-size" placeholder="1">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="outline-color" class="col-sm-4 col-form-label">Outline
+                                                    Color</label>
+                                                <div class="col-sm-8">
+                                                    <input type="text" name="outline-color" value="#000000"
+                                                        data-coloris>
+                                                </div>
+                                            </div>
+                                            <hr>
+                                            <div class="row">
+                                                <label for="hasShadow" class="col-sm-4 col-form-label">Has
+                                                    Shadow</label>
+                                                <div class="col-sm-8">
+                                                    <input type="checkbox" name="hasShadow">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="shadow-type" class="col-sm-4 col-form-label">Shadow
+                                                    Type</label>
+                                                <div class="col-sm-8">
+                                                    <select name="shadow-type">
+                                                        <option value="outer">outer</option>
+                                                        <option value="inner">inner</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="shadow-color" class="col-sm-4 col-form-label">Shadow
+                                                    Color</label>
+                                                <div class="col-sm-8">
+                                                    <input type="text" name="shadow-color" value="#000000" data-coloris>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="shadow-blur" class="col-sm-4 col-form-label">Shadow Blur
+                                                    (pt)</label>
+                                                <div class="col-sm-8">
+                                                    <input type="number" name="shadow-blur" placeholder="3">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="shadow-offset" class="col-sm-4 col-form-label">Shadow Offset
+                                                    (pt)</label>
+                                                <div class="col-sm-8">
+                                                    <input type="number" name="shadow-offset" placeholder="3">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="shadow-angle" class="col-sm-4 col-form-label">Shadow Angle
+                                                    (°)</label>
+                                                <div class="col-sm-8">
+                                                    <input type="number" name="shadow-angle" placeholder="45">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="shadow-opacity" class="col-sm-4 col-form-label">Shadow
+                                                    Opacity
+                                                    (°)</label>
+                                                <div class="col-sm-8">
+                                                    <input type="number" min="0" max="1" step="0.1"
+                                                        name="shadow-opacity" placeholder="0.5">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+
+                                </div>
+                                <div class="col-md-6 col-sm-12 mt-md-2 mt-sm-3">
+                                    <hr class="d-sm-block d-md-none">
+                                    <span>副内容属性</span>
+                                    <hr>
+                                    <form action="post" id="secondarySettings">
+                                        <div class="container-fluid p-0">
+                                            <div class="row">
+                                                <label for="x" class="col-sm-4 col-form-label">X(%)</label>
+                                                <div class="col-sm-8">
+                                                    <input type="number" id="x" name="x" placeholder="0">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="y-upper" class="col-sm-4 col-form-label">Upper Y(%)</label>
+                                                <div class="col-sm-8">
+                                                    <input type="number" name="y-upper" placeholder="10">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="y-lower" class="col-sm-4 col-form-label">Lower Y(%)</label>
+                                                <div class="col-sm-8">
+                                                    <input type="number" name="y-lower" placeholder="10">
+                                                </div>
+                                            </div>
+                                            <hr>
+                                            <div class="row">
+                                                <label for="bold" class="col-sm-4 col-form-label">Bold</label>
+                                                <div class="col-sm-8">
+                                                    <input type="checkbox" name="bold">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="color" class="col-sm-4 col-form-label">Font Color</label>
+                                                <div class="col-sm-8">
+                                                    <input type="text" name="color" value="#000000" data-coloris>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="fontFace" class="col-sm-4 col-form-label">Font</label>
+                                                <div class="col-sm-8">
+                                                    <input list="fontFaces" name="fontFace" /></label>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="fontSize" class="col-sm-4 col-form-label">Font Size
+                                                    (pt)</label>
+                                                <div class="col-sm-8">
+                                                    <input type="number" name="fontSize" placeholder="48">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="charSpacing" class="col-sm-4 col-form-label">Char Spacing
+                                                    (pt)</label>
+                                                <div class="col-sm-8">
+                                                    <input type="number" name="charSpacing" placeholder="2">
+                                                </div>
+                                            </div>
+
+                                            <hr>
+                                            <div class="row">
+                                                <label for="cover-y" class="col-sm-4 col-form-label">Cover Y(%)</label>
+                                                <div class="col-sm-8">
+                                                    <input type="number" name="cover-y" placeholder="10">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="cover-fontFace" class="col-sm-4 col-form-label">Cover
+                                                    Font</label>
+                                                <div class="col-sm-8">
+                                                    <input list="fontFaces" name="cover-fontFace" /></label>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="cover-fontSize" class="col-sm-4 col-form-label">Cover Font
+                                                    Size (pt)</label>
+                                                <div class="col-sm-8">
+                                                    <input type="number" name="cover-fontSize" placeholder="10">
+                                                </div>
+                                            </div>
+                                            <hr>
+                                            <div class="row">
+                                                <label for="hasGlow" class="col-sm-4 col-form-label">Has Glow</label>
+                                                <div class="col-sm-8">
+                                                    <input type="checkbox" name="hasGlow">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="glow-size" class="col-sm-4 col-form-label">Glow Size
+                                                    (pt)</label>
+                                                <div class="col-sm-8">
+                                                    <input type="number" name="glow-size" placeholder="5">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="glow-color" class="col-sm-4 col-form-label">Glow
+                                                    Color</label>
+                                                <div class="col-sm-8">
+                                                    <input type="text" name="glow-color" value="#000000" data-coloris>
+                                                </div>
+                                            </div>
+                                            <hr>
+                                            <div class="row">
+                                                <label for="hasOutline" class="col-sm-4 col-form-label">Has
+                                                    Outline</label>
+                                                <div class="col-sm-8">
+                                                    <input type="checkbox" name="hasOutline">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="outline-size" class="col-sm-4 col-form-label">Outline Weight
+                                                    (pt)</label>
+                                                <div class="col-sm-8">
+                                                    <input type="number" name="outline-size" placeholder="1">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="outline-color" class="col-sm-4 col-form-label">Outline
+                                                    Color</label>
+                                                <div class="col-sm-8">
+                                                    <input type="text" name="outline-color" value="#000000"
+                                                        data-coloris>
+                                                </div>
+                                            </div>
+                                            <hr>
+                                            <div class="row">
+                                                <label for="hasShadow" class="col-sm-4 col-form-label">Has
+                                                    Shadow</label>
+                                                <div class="col-sm-8">
+                                                    <input type="checkbox" name="hasShadow">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="shadow-type" class="col-sm-4 col-form-label">Shadow
+                                                    Type</label>
+                                                <div class="col-sm-8">
+                                                    <select name="shadow-type">
+                                                        <option value="outer">outer</option>
+                                                        <option value="inner">inner</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="shadow-color" class="col-sm-4 col-form-label">Shadow
+                                                    Color</label>
+                                                <div class="col-sm-8">
+                                                    <input type="text" name="shadow-color" value="#000000" data-coloris>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="shadow-blur" class="col-sm-4 col-form-label">Shadow Blur
+                                                    (pt)</label>
+                                                <div class="col-sm-8">
+                                                    <input type="number" name="shadow-blur" placeholder="3">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="shadow-offset" class="col-sm-4 col-form-label">Shadow Offset
+                                                    (pt)</label>
+                                                <div class="col-sm-8">
+                                                    <input type="number" name="shadow-offset" placeholder="3">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="shadow-angle" class="col-sm-4 col-form-label">Shadow Angle
+                                                    (°)</label>
+                                                <div class="col-sm-8">
+                                                    <input type="number" name="shadow-angle" placeholder="45">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="shadow-opacity" class="col-sm-4 col-form-label">Shadow
+                                                    Opacity
+                                                    (°)</label>
+                                                <div class="col-sm-8">
+                                                    <input type="number" min="0" max="1" step="0.1"
+                                                        name="shadow-opacity" placeholder="0.5">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="kratos-hentry kratos-post-inner clearfix">
+                    <div class="kratos-post-content">
+                        <!-- 内容 -->
+                        <h3>5. 生成</h3>
+                        <div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="chbHasIgnoreSecondaryContent">
+                                <label class="form-check-label" for="chbHasIgnoreSecondaryContent">忽略副内容</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="chbIsOneLinePerSlide">
+                                <label class="form-check-label" for="chbIsOneLinePerSlide">单行模式</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="chbIsBackgroundColorWhenEmpty" checked>
+                                <label class="form-check-label" for="chbIsBackgroundColorWhenEmpty">在没有歌词时候不应用背景图</label>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-custom" onclick="onGeneratePptClick()">
+                            生成PPT
+                        </button>
+                    </div>
+                </div>
+                <div class="kratos-hentry kratos-post-inner clearfix">
+                    <div class="kratos-post-content">
+                        <!-- 内容 -->
+                        <div>
+                            <!-- <a href="#advanced-setting">高级设定</a> -->
+                            <h3>6. 高级设定</h3>
+                            <p>
+                                可以参考
+                                <a href="https://gitbrent.github.io/PptxGenJS/docs/api-text/" target="_blank">
+                                    https://gitbrent.github.io/PptxGenJS/docs/api-text/
+                                </a>
+                            </p>
+
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <button type="button" class="btn-custom"
+                                        onclick="onRestoreNormalDefaultOptionClick()">
+                                        普通预设
+                                    </button>
+                                    <button type="button" class="btn-custom"
+                                        onclick="onRestoreGreenScreenDefaultOptionClick()">
+                                        绿幕预设
+                                    </button>
+                                    <a href="./assets/img/greenScreenWithBlackCover_v2.png" target="_blank">
+                                        <i class="fa-solid fa-up-right-from-square"></i> 预设绿幕背景图
+                                    </a>
+                                </div>
+                                <div>
+                                    <label class="custom-file-upload cursor-pointer onhover-underline default-anchor">
+                                        <input type="file" class="d-none" id="uploadSetting"
+                                            accept="application/JSON" />
+                                        导入设定
+                                    </label>
+
+                                    <button type="button" class="btn-custom" onclick="onExportSettingClick()">
+                                        导出设定
+                                    </button>
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <div style="width:47%">
+                                <span>主内容属性</span>
+                                <textarea id="txt-advanced-primary-options" class="texttosrt"></textarea>
+                            </div>
+                            <div style="width:47%">
+                                <span>副内容属性</span>
+                                <textarea id="txt-advanced-secondary-options" class="texttosrt"></textarea>
+                            </div>
+                        </div>
+                        <p>
+                            注：生成PPT时将以高级设定为准
+                        </p>
+                    </div>
+                </div>
+                <div class="kratos-hentry kratos-post-inner clearfix">
+                    <div class="kratos-post-content">
+                        <!-- 内容 -->
+                        <div>
+                            <!-- <a href="#advanced-setting">高级设定</a> -->
+                            <h3>7. 预设设定浏览</h3>
+                            <ul>
+                                <li><a href="./assets/storage/NewPptGeneratorSettingv3.json" target="_blank">普通预设</a>
+                                </li>
+                                <li><a href="./assets/storage/EnglishOnlyv2.json" target="_blank">英文普通预设</a></li>
+                                <li><a href="./assets/storage/EnglishOnlyLivev2.json" target="_blank">英文绿幕预设</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </section>
+    </div>
+</div>
+</div>
+<script type="text/javascript" src="./assets/js/drag-n-drop.js"></script>
+<script type="text/javascript" src="./bundle/vendors/pptxgen/pptxgen.bundle.js"></script>
+<script type="text/javascript" src="./bundle/vendors/coloris/coloris.min.js"></script>
+<script type="text/javascript" src="./bundle/vendors/sweetalert2/sweetalert2@11.js"></script>
+<script type="text/javascript" src="./assets/js/text-convertor.min.js"></script>
+<script type="text/javascript" src="./assets/js/ppt-generator.min.js"></script>

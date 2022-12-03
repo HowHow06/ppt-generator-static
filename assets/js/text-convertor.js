@@ -77,6 +77,13 @@ function onClearClick() {
   inputText["value"] = "";
 }
 
+function getAllIndexes(arr, val) {
+  var indexes = [],
+    i;
+  for (i = 0; i < arr.length; i++) if (arr[i] === val) indexes.push(i);
+  return indexes;
+}
+
 function contentToPinyin({ hasSound = false, content = "" }) {
   if (content.length == 0) {
     return "";
@@ -101,12 +108,24 @@ function contentToPinyin({ hasSound = false, content = "" }) {
       continue;
     }
 
-    const multiPinyinIndex = multiPinyinString.indexOf(currentCharacter);
     const isLastCharacter = i === cc.length - 1;
-    const isMultiPinyin =
-      !isLastCharacter &&
-      multiPinyinIndex != -1 &&
-      multiPinyinString[multiPinyinIndex + 1] == cc.charAt(i + 1);
+    const multiPinyinIndexes = getAllIndexes(
+      multiPinyinString,
+      currentCharacter
+    );
+    let multiPinyinIndex = -1;
+    let isMultiPinyin = false;
+
+    for (const index of multiPinyinIndexes) {
+      multiPinyinIndex = index;
+      isMultiPinyin =
+        !isLastCharacter &&
+        multiPinyinIndex != -1 &&
+        multiPinyinString[multiPinyinIndex + 1] == cc.charAt(i + 1);
+      if (isMultiPinyin) {
+        break;
+      }
+    }
 
     if (isMultiPinyin) {
       s = 2;
@@ -192,11 +211,11 @@ const showCopiedToClipboardAlert = () => {
 
 // below is the text util
 function getMultiPinyinWithoutSound() {
-  return "差派chai pai,降服xiang fu,长存chang cun,得着de zhao,什么shen me,長存chang cun,得著de zhao,什麽shen me,乾渴gan ke,得著de zhao,";
+  return "差派chai pai,降服xiang fu,长存chang cun,得着de zhao,什么shen me,長存chang cun,得著de zhao,什麽shen me,乾渴gan ke,";
 }
 
 function getMultiPinyinWithSound() {
-  return "差派chāi pài,降服xiáng fú,长存cháng cún,得着dé zháo,什么shén me,長存cháng cún,得著dé zháo,什麽shén me,乾渴gān kě,得著dé zháo,";
+  return "差派chāi pài,降服xiáng fú,长存cháng cún,得着dé zháo,什么shén me,長存cháng cún,得著dé zháo,什麽shén me,乾渴gān kě,";
 }
 
 function getPinyinWithSound() {

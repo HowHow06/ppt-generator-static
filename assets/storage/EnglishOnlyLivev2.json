@@ -5,7 +5,7 @@
     "cover": { "y": "87%", "fontSize": "32", "fontFace": "Segoe Print" },
     "bold": true,
     "color": "FFFFFF",
-    "fontFace": "Microsoft Yahei",
+    "fontFace": "Ebrima",
     "fontSize": "26",
     "charSpacing": "0",
     "shadow": {
@@ -23,7 +23,7 @@
     "cover": { "y": "%", "fontSize": "", "fontFace": "" },
     "bold": true,
     "color": "FFFFFF",
-    "fontFace": "Microsoft Yahei",
+    "fontFace": "Ebrima",
     "fontSize": "18",
     "charSpacing": "0",
     "shadow": {

@@ -20,10 +20,10 @@
   "advancedSecondaryOption": {
     "x": "0%",
     "y": { "upper": "39%", "lower": "69%" },
-    "cover": { "y": "50%", "fontSize": "48", "fontFace": "Microsoft Yahei" },
+    "cover": { "y": "50%", "fontSize": "48", "fontFace": "Ebrima" },
     "bold": true,
     "color": "FFFFFF",
-    "fontFace": "Microsoft Yahei",
+    "fontFace": "Ebrima",
     "fontSize": "31",
     "charSpacing": "0",
     "shadow": {

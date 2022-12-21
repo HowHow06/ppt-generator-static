@@ -76,11 +76,11 @@ const DEFAULT_OPTION = {
       cover: {
         y: "50%",
         fontSize: "48",
-        fontFace: "Microsoft Yahei",
+        fontFace: "Ebrima",
       },
       bold: true,
       color: "FFFFFF",
-      fontFace: "Microsoft Yahei",
+      fontFace: "Ebrima",
       fontSize: "31",
       charSpacing: "0",
       shadow: {
@@ -132,7 +132,7 @@ const DEFAULT_OPTION = {
       },
       bold: true,
       color: "FFFFFF",
-      fontFace: "Microsoft Yahei",
+      fontFace: "Ebrima",
       fontSize: "18",
       charSpacing: "0",
       shadow: {

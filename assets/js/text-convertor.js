@@ -211,11 +211,11 @@ const showCopiedToClipboardAlert = () => {
 
 // below is the text util
 function getMultiPinyinWithoutSound() {
-  return "差派chai pai,降服xiang fu,长存chang cun,得着de zhao,什么shen me,長存chang cun,得著de zhao,什麽shen me,乾渴gan ke,乾旱gan han,重新chong xin,淹没yan mo,长阔chang kuo,";
+  return "差派chai pai,降服xiang fu,长存chang cun,得着de zhao,什么shen me,長存chang cun,得著de zhao,什麽shen me,乾渴gan ke,乾旱gan han,重新chong xin,淹没yan mo,长阔chang kuo,朝阳zhao yang,";
 }
 
 function getMultiPinyinWithSound() {
-  return "差派chāi pài,降服xiáng fú,长存cháng cún,得着dé zháo,什么shén me,長存cháng cún,得著dé zháo,什麽shén me,乾渴gān kě,乾旱gān hàn,重新chóng xīn,淹没yān mò,长阔cháng kuò,";
+  return "差派chāi pài,降服xiáng fú,长存cháng cún,得着dé zháo,什么shén me,長存cháng cún,得著dé zháo,什麽shén me,乾渴gān kě,乾旱gān hàn,重新chóng xīn,淹没yān mò,长阔cháng kuò,朝阳zhāo yáng,";
 }
 
 function getPinyinWithSound() {

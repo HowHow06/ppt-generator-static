@@ -708,6 +708,14 @@
                                 <input class="form-check-input" type="checkbox" id="chbIsBackgroundColorWhenEmpty" checked>
                                 <label class="form-check-label" for="chbIsBackgroundColorWhenEmpty">在没有歌词时候不应用背景图</label>
                             </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="chbIsSavePptBySection" checked>
+                                <label class="form-check-label" for="chbIsSavePptBySection">把各Section分开生成</label>
+                            </div>
+                            <div >
+                                <label for="txtFileName">档案名称: </label>
+                                <input type="text" id="txtFileName">
+                            </div>
                         </div>
                         <button type="button" class="btn-custom" onclick="onGeneratePptClick()">
                             生成PPT
@@ -793,8 +801,9 @@
 </div>
 <script type="text/javascript" src="./assets/js/drag-n-drop.js"></script>
 <script type="text/javascript" src="./bundle/vendors/pptxgen/pptxgen.bundle.js"></script>
-<script type="text/javascript" src="./bundle/vendors/coloris/coloris.min.js"></script>
+<script type="text/javascript" src="./bundle/vendors/coloris/coloris.js"></script>
 <script type="text/javascript" src="./bundle/vendors/sweetalert2/sweetalert2@11.js"></script>
+<script type="text/javascript" src="./bundle/vendors/jszip/jszip.min.js"></script>
 <script type="text/javascript" src="./assets/js/text-convertor.min.js"></script>
 <script type="text/javascript" src="./assets/js/ppt-generator.min.js"></script>
 

@@ -7,6 +7,8 @@ const backgroundColorElement = document.getElementById("colorPickerBackground");
 const primaryFormElement = document.getElementById("primarySettings");
 const secondaryFormElement = document.getElementById("secondarySettings");
 const fileNameElement = document.getElementById("txtFileName");
+const fileNamePrefixElement = document.getElementById("txtFileNamePrefix");
+const fileNameSuffixElement = document.getElementById("txtFileNameSuffix");
 const advancedPrimaryOptionElement = document.getElementById(
   "txt-advanced-primary-options"
 );
@@ -330,7 +332,7 @@ function createSlidesFromLyrics({
     if (isSectionLine) {
       sectionCount++;
       const sectionName = primaryLine.replace("--- ", "");
-      currentSectionName = sectionName;
+      currentSectionName = sectionName ?? "";
 
       if (
         currentSectionInfo.sectionName &&
@@ -457,9 +459,11 @@ async function generateFullPpt({
   const customSecondaryOption = GetCustomSecondaryOption();
   const linePerRow = linePerSlide;
   let fileName = fileNameElement.value || DEFAULT_FILE_NAME;
-  fileName = fileName.toString().toLowerCase().endsWith(".pptx")
-    ? fileName
-    : fileName + ".pptx";
+  const cleanFileName = fileName.toString().replace(/\.pptx$/i, "");
+  const fileNameSuffix = fileNameSuffixElement.value ?? "";
+  const fileNamePrefix = fileNamePrefixElement.value ?? "";
+
+  fileName = fileNamePrefix + cleanFileName + fileNameSuffix + ".pptx";
 
   // 4. Create Slides in the Presentation
   const { sectionsInfo } = createSlidesFromLyrics({
@@ -480,7 +484,6 @@ async function generateFullPpt({
 
   // 6. If need to separate ppt by section, recreate each ppt and put into zip
   if (isSavePptBySection) {
-    console.log(sectionsInfo);
     var zip = new JSZip();
     const fileContent = await pres.write();
     zip.file(fileName, fileContent);
@@ -507,14 +510,18 @@ async function generateFullPpt({
       });
 
       const fileContent = await tempPres.write();
-      const cleanSectionName = sectionName.replace(/^\d+\.\s+/, ""); // remove the numbering in front
-      zip.file(`${cleanSectionName}.pptx`, fileContent);
+      const cleanSectionName =
+        sectionName?.replace(/^\d+\.\s+/, "") || "Section"; // remove the numbering in front
+      zip.file(
+        `${fileNamePrefix}${cleanSectionName}${fileNameSuffix}.pptx`,
+        fileContent
+      );
     }
 
     zip.generateAsync({ type: "blob" }).then(function (content) {
       var link = document.createElement("a");
       link.href = URL.createObjectURL(content);
-      link.download = "Slides.zip";
+      link.download = cleanFileName + "_files.zip";
       link.click();
     });
   }

@@ -629,14 +629,28 @@ function AddTextLineToSlide({
 
   slide.addText(line, {
     ...finalOption,
-    shadow: {
-      ...(finalOption.shadow ?? null),
-      type: "outer",
-      blur: finalOption.shadow?.blur ?? 3,
-      offset: finalOption.shadow?.offset ?? 3,
-      angle: finalOption.shadow?.angle ?? 45,
-      opacity: finalOption.shadow?.opacity ?? 0.5,
-    },
+    ...(finalOption.shadow
+      ? {
+          shadow: {
+            ...(finalOption.shadow ?? null),
+            type: "outer",
+            blur:
+              finalOption.shadow?.blur == null ? 3 : finalOption.shadow?.blur,
+            offset:
+              finalOption.shadow?.offset == null
+                ? 3
+                : finalOption.shadow?.offset,
+            angle:
+              finalOption.shadow?.angle == null
+                ? 45
+                : finalOption.shadow?.angle,
+            opacity:
+              finalOption.shadow?.opacity == null
+                ? 0.5
+                : finalOption.shadow?.opacity,
+          },
+        }
+      : null),
   });
 }
 

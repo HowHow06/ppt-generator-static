@@ -306,6 +306,11 @@ function createPresentation({
   return pres;
 }
 
+function startsWithNumbering(str) {
+  const regex = /^[0-9]+\./;
+  return regex.test(str);
+}
+
 function createSlidesFromLyrics({
   pres,
   primaryLinesArray,
@@ -317,36 +322,57 @@ function createSlidesFromLyrics({
   hasSecondaryContent,
 }) {
   let coverCount = 0;
-  let sectionCount = 0;
-  let currentSectionName = "";
-  const sectionsInfo = [];
-  let currentSectionInfo = {};
+  let pptSectionCount = 0;
+  let mainSectionCount = 0;
+  let subsectionCount = 0;
+  let currentPptSectionName = "";
+  const mainSectionsInfo = []; // to save ppt by main section
+  let currentMainSectionInfo = {};
 
   primaryLinesArray.forEach((primaryLine, index) => {
     const isCover = primaryLine.startsWith("# ");
-    const isSectionLine = primaryLine.startsWith("--- ");
+    const isSectionLine = primaryLine.startsWith("---- ");
+    const isSubSectionLine = primaryLine.startsWith("--- ");
     const isLastLine = index == primaryLinesArray.length - 1;
     let currentLine = primaryLine;
-    const currentIndex = index - coverCount - sectionCount;
+    const currentIndex = index - coverCount - pptSectionCount;
 
     if (isSectionLine) {
-      sectionCount++;
-      const sectionName = primaryLine.replace("--- ", "");
-      currentSectionName = sectionName ?? "";
+      pptSectionCount++;
+      mainSectionCount++;
+      subsectionCount = 0;
+      let sectionName = primaryLine.replace("---- ", "");
+      if (!startsWithNumbering(sectionName)) {
+        sectionName = `${mainSectionCount}.0 ${sectionName}`;
+      }
+      currentPptSectionName = sectionName ?? "";
 
       if (
-        currentSectionInfo.sectionName &&
-        currentSectionInfo.sectionName !== sectionName
+        currentMainSectionInfo.sectionName &&
+        currentMainSectionInfo.sectionName !== sectionName
       ) {
-        // is new section
-        currentSectionInfo = {
-          ...currentSectionInfo,
+        // is new section, update the endLineIndex for last section
+        currentMainSectionInfo = {
+          ...currentMainSectionInfo,
           endLineIndex: index - 1,
         };
-        sectionsInfo.push(currentSectionInfo);
+        mainSectionsInfo.push(currentMainSectionInfo);
       }
 
-      currentSectionInfo = { sectionName, startLineIndex: index };
+      currentMainSectionInfo = { sectionName, startLineIndex: index };
+      pres.addSection({ title: sectionName });
+      return;
+    }
+
+    if (isSubSectionLine) {
+      pptSectionCount++;
+      subsectionCount++;
+      let sectionName = primaryLine.replace("--- ", "");
+      if (!startsWithNumbering(sectionName)) {
+        sectionName = `${mainSectionCount}.${subsectionCount} ${sectionName}`;
+      }
+      currentPptSectionName = sectionName ?? "";
+
       pres.addSection({ title: sectionName });
       return;
     }
@@ -366,7 +392,7 @@ function createSlidesFromLyrics({
       isCover,
       isEmptyLine,
       isBackgroundColorWhenEmpty,
-      ...(currentSectionName && { currentSection: currentSectionName }),
+      ...(currentPptSectionName && { currentSection: currentPptSectionName }),
     });
 
     const currentLyricPosition = isCover
@@ -410,16 +436,16 @@ function createSlidesFromLyrics({
     }
 
     if (isLastLine) {
-      currentSectionInfo = {
-        ...currentSectionInfo,
+      currentMainSectionInfo = {
+        ...currentMainSectionInfo,
         endLineIndex: index,
       };
-      sectionsInfo.push(currentSectionInfo);
+      mainSectionsInfo.push(currentMainSectionInfo);
     }
   });
 
   return {
-    sectionsInfo,
+    sectionsInfo: mainSectionsInfo,
   };
 }
 

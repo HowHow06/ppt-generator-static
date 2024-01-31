@@ -311,6 +311,11 @@ function startsWithNumbering(str) {
   return regex.test(str);
 }
 
+function extractNumber(str) {
+  const match = str.match(/^([0-9]+)\./);
+  return match ? Number(match[1]) : null;
+}
+
 function createSlidesFromLyrics({
   pres,
   primaryLinesArray,
@@ -339,11 +344,17 @@ function createSlidesFromLyrics({
 
     if (isSectionLine) {
       pptSectionCount++;
-      mainSectionCount++;
       subsectionCount = 0;
       let sectionName = primaryLine.replace("---- ", "");
-      if (!startsWithNumbering(sectionName)) {
-        sectionName = `${mainSectionCount}.0 ${sectionName}`;
+      const isStartWithNumbering = startsWithNumbering(sectionName);
+      if (isStartWithNumbering) {
+        mainSectionCount = extractNumber(sectionName);
+      } else {
+        mainSectionCount++;
+      }
+
+      if (!isStartWithNumbering) {
+        sectionName = `${mainSectionCount}. ${sectionName}`;
       }
       currentPptSectionName = sectionName ?? "";
 
